@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Author;
 use App\Models\Category;
 use COM;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class BookFactory extends Factory
             'body' => fake()->paragraphs(3, true),
             'published_at' => fake()->boolean(70) ? fake()->dateTimeBetween('-5 year', 'now') : null,
             'category_id' => Category::inRandomOrder()->first()->id ?? Category::factory(),
+            'author_id' => Author::inRandomOrder()->first()->id ?? Author::factory(),
         ];
     }
 }
