@@ -10,56 +10,33 @@ use Illuminate\Http\Request;
 class HallController extends Controller
 {
     public function index()
-{
-    $title = 'Hall';
-    $books = Book::all();
+    {
+        $title = 'Hall';
+        $books = Book::paginate(10);
 
-    return view('hall', compact('title', 'books'));
-    // return dd($books);
-}
+        return view('hall', compact('title', 'books'));
+    }
 
-public function singleBook($slug)
-{
-    $book = Book::where('slug', $slug)->first();
-    $title = $book->name;
-    return dd($book);
-}
+    public function singleBook(Book $book)
+    {
+        $title = $book->name;
+        return view('single-book', compact('book', 'title'));
+        // jangan pakai dd() di production
+    }
 
-public function singleCategory($slug)
-{
-    $category = Category::where('slug', $slug)->first();
-    $books = Book::where('category_id', $category->id)->get();
-    $title = 'Books of ' . $category->name;
-    return view('hall', compact('title', 'books'));
-}
+    public function singleCategory(Category $category)
+    {
+        $books = Book::where('category_id', $category->id)->paginate(10);
+        $title = 'Books of ' . $category->name;
 
-public function getbyAuthor($slug)
-{
-    $author = Author::where('slug', $slug)->first();
-    $books = Book::where('author_id', $author->id)->get();
-    $title = 'Books by ' . $author->name;
-    return view('hall', compact('title', 'books'));
-}
+        return view('hall', compact('title', 'books'));
+    }
 
-public function singleBook(Book $book)
-{
-    $title = $book->name;
-    return dd($book);
-}
+    public function hallAuthor(Author $author)
+    {
+        $books = Book::where('author_id', $author->id)->paginate(10);
+        $title = 'Books by ' . $author->name;
 
-public function hallAuthor(Author $author)
-{
-    $title = 'Books of ' . $author->name;
-    $books = Book::where('author_id', $author->id)->get();
-    return view('hall', compact('books', 'title'));
-}
-
-public function hallCategory(Category $category)
-{
-    $title = 'Books of ' . $category->name;
-    $books = Book::where('category_id', $category->id)->get();
-    return view('hall', compact('books', 'title'));
-}
-
-
+        return view('hall', compact('title', 'books'));
+    }
 }
