@@ -5,14 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
-use Illuminate\Http\Request;
 
 class HallController extends Controller
 {
     public function index()
     {
-        $title = 'Hall';
-        $books = Book::paginate(10);
+        $titleSuffix = '';
+
+        if (request('category')) {
+            $category = Category::where('slug', request('category'))->first();
+            if ($category) {
+                $titleSuffix = 'of ' . $category->name;
+            }
+        }
+
+        if (request('author')) {
+            $author = Author::where('slug', request('author'))->first();
+            if ($author) {
+                $titleSuffix = 'by ' . $author->name;
+            }
+        }
+
+        $title = 'Hall ' . $titleSuffix;
+
+        $books = Book::latest()
+            ->search(request(['search', 'category', 'author']))
+            ->paginate(10)
+            ->withQueryString();
 
         return view('hall', compact('title', 'books'));
     }
@@ -20,23 +39,7 @@ class HallController extends Controller
     public function singleBook(Book $book)
     {
         $title = $book->name;
-        return view('single-book', compact('book', 'title'));
-        // jangan pakai dd() di production
-    }
 
-    public function singleCategory(Category $category)
-    {
-        $books = Book::where('category_id', $category->id)->paginate(10);
-        $title = 'Books of ' . $category->name;
-
-        return view('hall', compact('title', 'books'));
-    }
-
-    public function hallAuthor(Author $author)
-    {
-        $books = Book::where('author_id', $author->id)->paginate(10);
-        $title = 'Books by ' . $author->name;
-
-        return view('hall', compact('title', 'books'));
+        return view('book', compact('book', 'title'));
     }
 }
