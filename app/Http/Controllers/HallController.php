@@ -10,36 +10,30 @@ class HallController extends Controller
 {
     public function index()
     {
-        $titleSuffix = '';
+        $title = '';
 
         if (request('category')) {
             $category = Category::where('slug', request('category'))->first();
-            if ($category) {
-                $titleSuffix = 'of ' . $category->name;
-            }
+            $title = " of " . $category->name;
         }
-
         if (request('author')) {
             $author = Author::where('slug', request('author'))->first();
-            if ($author) {
-                $titleSuffix = 'by ' . $author->name;
-            }
+            $title = " by " . $author->name;
         }
 
-        $title = 'Hall ' . $titleSuffix;
+        $title = 'Hall ' . $title;
 
         $books = Book::latest()
-            ->search(request(['search', 'category', 'author']))
-            ->paginate(10)
-            ->withQueryString();
+                ->search(request(['search', 'category', 'author']))
+                ->paginate(10)
+                ->withQueryString();
 
         return view('hall', compact('title', 'books'));
     }
 
-    public function singleBook(Book $book)
-    {
+    public function singleBook(Book $book) {
         $title = $book->name;
-
-        return view('book', compact('book', 'title'));
+        
+        return view('book', compact('title', 'book'));
     }
 }
